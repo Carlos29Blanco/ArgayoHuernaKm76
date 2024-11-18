@@ -14,13 +14,14 @@
             "esri/views/SceneView",
             "esri/Map",
             "esri/layers/GeoJSONLayer",
+            "esri/layers/MapImageLayer",
             "esri/widgets/Home",
             "esri/widgets/BasemapGallery",
             "esri/widgets/Expand",
             "esri/renderers/UniqueValueRenderer",
             "esri/symbols/LineSymbol3D",
             "esri/symbols/LineSymbol3DLayer"
-        ], (SceneView, Map, GeoJSONLayer, Home, BasemapGallery, Expand, UniqueValueRenderer, LineSymbol3D, LineSymbol3DLayer) => {
+        ], (SceneView, Map, GeoJSONLayer, MapImageLayer, Home, BasemapGallery, Expand, UniqueValueRenderer, LineSymbol3D, LineSymbol3DLayer) => {
 
             // Definimos el mapa con el basemap de Imagery Hybrid
             const map = new Map({
@@ -34,11 +35,11 @@
                 map: map,
                 camera: {
                     position: {
-                        latitude: 43.036334, // Latitud del Km 76 de la AP-66
-                        longitude: -5.833734, // Longitud del Km 76 de la AP-66
-                        z: 1800 // Altura del zoom
+                        latitude: 43.047560, // Latitud del Km 76 de la AP-66 43.047560, -5.850105
+                        longitude: -5.850105, // Longitud del Km 76 de la AP-66
+                        z: 4000 // Altura del zoom
                     },
-                    tilt: 60,
+                    tilt: 40,
                     heading: 135 // Orientación hacia el sureste (135 grados)
                 }
             });
@@ -80,6 +81,15 @@
 
             // Añadir la capa de ríos al mapa
             map.add(riversLayer);
+
+            // Añadir el servicio de IGME con transparencia
+            const igmeLayer = new MapImageLayer({
+                url: "https://mapas.igme.es/gis/rest/services/Cartografia_Geologica/IGME_Geode_50/MapServer",
+                opacity: 0.4 // 60% de transparencia
+            });
+
+            // Añadir la capa del servicio al mapa
+            map.add(igmeLayer);
 
             // Agregar el widget de Home
             const homeWidget = new Home({
@@ -142,7 +152,7 @@
     <div id="viewDiv"></div>
     <div id="legend" class="esri-widget container">
         <div class="legend-section">
-            <div class="title">Argayo en la autopista del Huerna app-66</div>
+            <div class="title">Argayo en la autopista del Huerna ap-66</div>
             <div class="legend-section-items">
                 <div class="legend-item">
                     <div class="symbol" id="riverSymbol"></div>

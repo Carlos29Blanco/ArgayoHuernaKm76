@@ -18,10 +18,12 @@
             "esri/widgets/Home",
             "esri/widgets/BasemapGallery",
             "esri/widgets/Expand",
+            "esri/widgets/LayerList",
+            "esri/widgets/Legend",
             "esri/renderers/UniqueValueRenderer",
             "esri/symbols/LineSymbol3D",
             "esri/symbols/LineSymbol3DLayer"
-        ], (SceneView, Map, GeoJSONLayer, MapImageLayer, Home, BasemapGallery, Expand, UniqueValueRenderer, LineSymbol3D, LineSymbol3DLayer) => {
+        ], (SceneView, Map, GeoJSONLayer, MapImageLayer, Home, BasemapGallery, Expand, LayerList, Legend, UniqueValueRenderer, LineSymbol3D, LineSymbol3DLayer) => {
 
             // Definimos el mapa con el basemap de Imagery Hybrid
             const map = new Map({
@@ -29,8 +31,8 @@
                 ground: "world-elevation"
             });
 
-            // Definimos la vista en 3D centrada en el Km 76 de la AP-66 con vista hacia el sureste
-            const view = new SceneView({
+             // Definimos la vista en 3D centrada en el Km 76 de la AP-66 con vista hacia el sureste
+             const view = new SceneView({
                 container: "viewDiv",
                 map: map,
                 camera: {
@@ -46,9 +48,11 @@
 
             // Capa de ríos desde el GeoJSON
             const geojsonUrl = "https://raw.githubusercontent.com/Carlos29Blanco/Carlos29Blanco/refs/heads/master/EntreRegueras.geojson";
+            
 
             const riversLayer = new GeoJSONLayer({
-                url: geojsonUrl
+                url: geojsonUrl,
+                title: "Regueras" // Cambia el título de la capa
             });
 
             // Simbología para los ríos según el campo "problema"
@@ -58,13 +62,15 @@
                     symbolLayers: [
                         new LineSymbol3DLayer({
                             material: { color: [0, 100, 255] }, // Color azul para el valor "No"
-                            size: "2px"
+                            size: "2px",
                         })
                     ]
                 }),
+                defaultLabel: "Otras regueras", // Texto para valores sin coincidencia
                 uniqueValueInfos: [
                     {
-                        value: "Si", // Color rojo para el valor "Si"
+                        value: "Si", // Color rojo para el valor "Si",
+                        label: "Reguera del Argayo", // Texto personalizado para "No"
                         symbol: new LineSymbol3D({
                             symbolLayers: [
                                 new LineSymbol3DLayer({
@@ -85,7 +91,7 @@
             // Añadir el servicio de IGME con transparencia
             const igmeLayer = new MapImageLayer({
                 url: "https://mapas.igme.es/gis/rest/services/Cartografia_Geologica/IGME_Geode_50/MapServer",
-                opacity: 0.4 // 60% de transparencia
+                opacity: 0.6 // 60% de transparencia
             });
 
             // Añadir la capa del servicio al mapa
@@ -111,8 +117,33 @@
 
             view.ui.add(basemapGalleryExpand, "top-right");
 
-            // Leyenda personalizada
-            view.ui.add("legend", "manual");
+           /*  // Agregar el Widget de Capas (LayerList)
+            const layerList = new LayerList({
+                view: view
+            });
+
+            const layerListExpand = new Expand({
+                view: view,
+                content: layerList,
+                expandIconClass: "esri-icon-layer-list", // Ícono del expandible
+                expandTooltip: "Show Layer List"
+            });
+
+            view.ui.add(layerListExpand, "top-right"); */
+
+            // Agregar el Widget de Leyenda
+            const legend = new Legend({
+                view: view
+            });
+
+            const legendExpand = new Expand({
+                view: view,
+                content: legend,
+                expandIconClass: "esri-icon-key", // Ícono del expandible
+                expandTooltip: "Show Legend"
+            });
+
+            view.ui.add(legendExpand, "top-right");
 
         });
     </script>
@@ -150,17 +181,6 @@
 
 <body>
     <div id="viewDiv"></div>
-    <div id="legend" class="esri-widget container">
-        <div class="legend-section">
-            <div class="title">Argayo en la autopista del Huerna ap-66</div>
-            <div class="legend-section-items">
-                <div class="legend-item">
-                    <div class="symbol" id="riverSymbol"></div>
-                    <div class="legend-item-title">En esta escena local podemos ver la reguera (en color rojo) que pudo causar el Argayo</div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>

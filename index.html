@@ -21,9 +21,12 @@
             "esri/widgets/LayerList",
             "esri/widgets/Legend",
             "esri/renderers/UniqueValueRenderer",
-            "esri/symbols/LineSymbol3D",
-            "esri/symbols/LineSymbol3DLayer"
-        ], (SceneView, Map, GeoJSONLayer, MapImageLayer, Home, BasemapGallery, Expand, LayerList, Legend, UniqueValueRenderer, LineSymbol3D, LineSymbol3DLayer) => {
+            "esri/renderers/SimpleRenderer",
+            "esri/symbols/PolygonSymbol3D",
+            "esri/symbols/FillSymbol3DLayer",
+            "esri/symbols/LineSymbol3DLayer",
+            "esri/symbols/LineSymbol3D"
+        ], (SceneView, Map, GeoJSONLayer, MapImageLayer, Home, BasemapGallery, Expand, LayerList, Legend, UniqueValueRenderer, SimpleRenderer, PolygonSymbol3D, FillSymbol3DLayer, LineSymbol3DLayer, LineSymbol3D) => {
 
             // Definimos el mapa con el basemap de Imagery Hybrid
             const map = new Map({
@@ -31,13 +34,13 @@
                 ground: "world-elevation"
             });
 
-             // Definimos la vista en 3D centrada en el Km 76 de la AP-66 con vista hacia el sureste
-             const view = new SceneView({
+            // Definimos la vista en 3D centrada en el Km 76 de la AP-66 con vista hacia el sureste
+            const view = new SceneView({
                 container: "viewDiv",
                 map: map,
                 camera: {
                     position: {
-                        latitude: 43.047560, // Latitud del Km 76 de la AP-66 43.047560, -5.850105
+                        latitude: 43.047560, // Latitud del Km 76 de la AP-66
                         longitude: -5.850105, // Longitud del Km 76 de la AP-66
                         z: 4000 // Altura del zoom
                     },
@@ -47,11 +50,10 @@
             });
 
             // Capa de ríos desde el GeoJSON
-            const geojsonUrl = "https://raw.githubusercontent.com/Carlos29Blanco/Carlos29Blanco/refs/heads/master/EntreRegueras.geojson";
-            
+            const geojsonUrlRivers = "https://raw.githubusercontent.com/Carlos29Blanco/Carlos29Blanco/refs/heads/master/EntreRegueras.geojson";
 
             const riversLayer = new GeoJSONLayer({
-                url: geojsonUrl,
+                url: geojsonUrlRivers,
                 title: "Regueras" // Cambia el título de la capa
             });
 
@@ -88,6 +90,34 @@
             // Añadir la capa de ríos al mapa
             map.add(riversLayer);
 
+            // Capa de argayos desde el GeoJSON
+            const geojsonUrlArgayos = "https://raw.githubusercontent.com/Carlos29Blanco/ArgayoHuernaKm76/refs/heads/main/ArgayosHuerna/Argayos.geojson";
+
+            const argayosLayer = new GeoJSONLayer({
+                url: geojsonUrlArgayos,
+                title: "Argayos" // Cambia el título de la capa
+            });
+
+            // Simbología para los argayos (polígonos en color rojo)
+            const argayosRenderer = new SimpleRenderer({
+                symbol: new PolygonSymbol3D({
+                    symbolLayers: [
+                        new FillSymbol3DLayer({
+                            material: { color: [255, 0, 0, 0.6] }, // Rojo con transparencia del 60%
+                            outline: {
+                                color: [255, 0, 0],
+                                size: "1px"
+                            }
+                        })
+                    ]
+                })
+            });
+
+            argayosLayer.renderer = argayosRenderer;
+
+            // Añadir la capa de argayos al mapa
+            map.add(argayosLayer);
+
             // Añadir el servicio de IGME con transparencia
             const igmeLayer = new MapImageLayer({
                 url: "https://mapas.igme.es/gis/rest/services/Cartografia_Geologica/IGME_Geode_50/MapServer",
@@ -117,7 +147,7 @@
 
             view.ui.add(basemapGalleryExpand, "top-right");
 
-           /*  // Agregar el Widget de Capas (LayerList)
+              // Agregar el Widget de Capas (LayerList)
             const layerList = new LayerList({
                 view: view
             });
@@ -129,7 +159,7 @@
                 expandTooltip: "Show Layer List"
             });
 
-            view.ui.add(layerListExpand, "top-right"); */
+            view.ui.add(layerListExpand, "top-right");
 
             // Agregar el Widget de Leyenda
             const legend = new Legend({
